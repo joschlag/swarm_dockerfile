@@ -1,12 +1,15 @@
-FROM continuumio/miniconda:4.7.10
-MAINTAINER <johannes.schlagbauer@uni-graz.at>
+FROM ubuntu:24.04
 
-ENV PATH /opt/conda/bin:$PATH
+RUN apt update && \
+	apt upgrade -y && \
+	apt install -y git make g++ && \
+	apt clean
 
-RUN conda config --append channels bioconda && \
-	conda config --append channels conda-forge && \
-	conda config --append channels anaconda && \
-	conda install -c bioconda swarm=3.1.5 && \
-	conda clean -a -y
+WORKDIR /usr/src
 
-CMD ["swarm"]
+RUN git clone https://github.com/torognes/swarm.git && \
+	cd swarm/ && \
+	git reset --hard 39b961c103f3bca698a51e320279e65dc29dee8e && \
+	make
+
+ENV PATH=${PATH}:/usr/src/swarm/bin
